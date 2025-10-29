@@ -39,6 +39,103 @@
 				<img src="utils/jsmeme.png" alt="jsMeme" width="300" height="350">
 			</div>
 		</div>
+		<h1 style="margin-bottom: 20px;">Simple presentation of quick skills</h1>
+
+		<h3> Creating a simple list with fill and pop function </h3>
+
+		<p>Start by making a list</p>
+		<pre class="left-align"><code>
+let stable = Array(10).fill(null);
+		</code></pre>
+
+		<p>Make a function to buy horses and export</p>
+		<pre class="left-align"><code>
+const buyNewHorses = (req, res) => {
+  stable = new Array(10).fill('Horses'); 
+  res.json(stable); 
+};
+
+export { buyNewHorses };
+		</code></pre>
+
+		<p>Import method and call in route and export</p>
+		<pre class="left-align"><code>
+import { buyNewHorses } from '../controllers/javaScriptController.js';
+const router = express.Router();
+
+router.get('/buy-horses', buyNewHorses);
+
+export default router;
+		</code></pre>
+
+		<p>Setup server.js</p>
+		<pre class="left-align"><code>
+// Imports for functional express nodejs app
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import routes from '../routes/index.js'; 
+
+//port to run app on 
+const port = 8080; 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Set static file folder
+app.use(express.static(path.join(__dirname, '../public')));
+
+// API routes
+app.use('/api', routes);
+
+//checks if app is running and return message in console
+app.listen(port, () => console.log(`✅ Server running on port ${port}`));
+
+export default app;
+		</code></pre>
+
+		<p>Script to add at bottom of html file</p>
+		<pre class="left-align"><code>
+script>
+    const stableDisplay = document.getElementById('stableDisplay');
+    const buyBtn = document.getElementById('buyBtn');
+    const sellBtn = document.getElementById('sellBtn');
+
+    const updateStableDisplay = (stable) => {
+      if(stable.length === 0) {
+        stableDisplay.textContent = 'Stable is empty';
+      } else {
+        // Show a horse emoji for each horse in the stable
+        stableDisplay.textContent = '🐴'.repeat(stable.length);
+      }
+    }
+
+    buyBtn.addEventListener('click', async () => {
+  const res = await fetch('/api/buy-horses');
+  const data = await res.json();
+  updateStableDisplay(data);
+});
+
+sellBtn.addEventListener('click', async () => {
+  const res = await fetch('/api/sell-horse');
+  const data = await res.json();
+  updateStableDisplay(data);
+});
+  /script>
+		</code></pre>
+
+		<p style="margin-bottom: 20px;">Create buttons for function result presented under here</p>
+
+		<div class="buttons">
+      <button id="buyBtn" style="padding: 20px 40px; font-size: 1.5rem;">Buy New Horses 🐴</button>
+      <button id="sellBtn" style="padding: 20px 40px; font-size: 1.5rem;">Sell Horse 🐎</button>
+    </div>
+
+    
+    <div class="stable-display" id="stableDisplay" style="font-size: 3rem;">
+      Stable is empty
+    </div>
 	</main>
 
 	
@@ -53,8 +150,31 @@
 	<footer>
 		<p>Ejlersen inc</p>
 	</footer>
-</body>
+<script>
+    const stableDisplay = document.getElementById('stableDisplay');
+    const buyBtn = document.getElementById('buyBtn');
+    const sellBtn = document.getElementById('sellBtn');
 
-<body>
+    const updateStableDisplay = (stable) => {
+      if(stable.length === 0) {
+        stableDisplay.textContent = 'Stable is empty';
+      } else {
+        // Show a horse emoji for each horse in the stable
+        stableDisplay.textContent = '🐴'.repeat(stable.length);
+      }
+    }
+
+    buyBtn.addEventListener('click', async () => {
+  const res = await fetch('/api/buy-horses');
+  const data = await res.json();
+  updateStableDisplay(data);
+});
+
+sellBtn.addEventListener('click', async () => {
+  const res = await fetch('/api/sell-horse');
+  const data = await res.json();
+  updateStableDisplay(data);
+});
+  </script>
 </body>
 </html>

@@ -12,9 +12,9 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.5;
     background-image: url('utils/star-4773.gif');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+    background-size: auto;
+    background-repeat: repeat;
+    background-position: center top;
     color: aliceblue;
     display: flex;
     flex-direction: column;
@@ -54,7 +54,7 @@ nav ul li a {
 }
 
 nav ul li a:hover {
-    background-color: blue;
+    background-color: purple;
 }
 
 main {
@@ -80,6 +80,7 @@ main .container {
 .center-column {
     text-align: center;
     max-width: 600;
+    margin: auto;
 }
 
 footer {
@@ -115,4 +116,8 @@ code {
 #workChart {
   width: 100% !important;  /* chart fills its container */
   height: auto !important;
+}
+
+pre.left-align {
+    text-align: left;
 }
