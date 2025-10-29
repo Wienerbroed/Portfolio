@@ -28,21 +28,31 @@
 
 	</header>
 
-	
+	 <main style="text-align: center;">
+    <h1>Contact Me</h1>
+    <form id="contactForm" style="max-width: 500px; margin: 2rem auto; text-align: left;">
+      <label for="name">Name:</label><br />
+      <input type="text" id="name" name="name" required style="width: 100%; padding: 0.5rem;"><br /><br />
 
-	<main style="text-align: center;">
-		<h1> Martin Ejlersen </h1>
-		<img src="utils/profilbillede.jpg" alt="My Picture" width="300">
-	</main>
-	<h1></h1>
+      <label for="email">Email:</label><br />
+      <input type="email" id="email" name="email" required style="width: 100%; padding: 0.5rem;"><br /><br />
+
+      <label for="message">Message:</label><br />
+      <textarea id="message" name="message" rows="6" required style="width: 100%; padding: 0.5rem;"></textarea><br /><br />
+
+      <button type="submit" style="padding: 0.5rem 1rem;">Send Message</button>
+    </form>
+
+    <p id="responseMsg"></p>
+  </main>
+
+	
 
 
 
 	<footer>
 		<p>Ejlersen inc</p>
 	</footer>
-</body>
-
-<body>
+ <script src="contact.js"></script>
 </body>
 </html>
