@@ -31,7 +31,12 @@
 	<main style="text-align: center;">
 		<div class="container">
 			<div class="left-column">
-				<h1>Frameworks</h1>
+				<h2>Frameworks and extensions</h2>
+				<p></p>
+				<p>Thymeleaf</p>
+				<p>SpringBoot</p>
+				<p>Maven</p>
+				<img src="utils/javameme.png" alt="JavaMeme">
 			</div>
 		</div>
 	</main>
@@ -39,8 +44,56 @@
 	
 
 	<main style="text-align: center;">
-		<h1> Martin Ejlersen </h1>
-		<img src="utils/profilbillede.jpg" alt="My Picture" width="300">
+		<h1 style="margin-bottom: 30px;">Simple presentation of quick skills</h1>
+		<h3>Making a simple greeting function</h3>
+		<div id="hello-section" style="margin-top: 2rem;">
+  <h2>Say Hello</h2>
+  <input type="text" id="visitorName" placeholder="Enter your name">
+  <button id="sayHelloBtn">Submit</button>
+  <p id="helloMessage"></p>
+</div>
+<p> Create greeting method </p>
+		<pre class="left-align"><code>
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
+public class HelloVisitorController {
+
+    @Value("${name:Developer}")
+    private String name;
+
+    @GetMapping("/helloVisitor")
+    public Map<String, String> helloVisitor(@RequestParam(required = false, defaultValue = "Visitor") String nameParam) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Hello " + nameParam + " and welcome to " + name + "'s portfolio");
+        return response;
+    }
+}			
+		</code></pre>
+
+<p> Apply class to run in main application</p>
+		<pre class="left-align"><code>
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class PortfolioApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(PortfolioApplication.class, args);
+        System.out.println("✅ Server running on http://localhost:8080");
+    }
+}
+		</code></pre>
+
+
+<p> Integrate into html to get a greeting function</p>		
+		
 	</main>
 	<h1></h1>
 
@@ -49,6 +102,21 @@
 	<footer>
 		<p>Ejlersen inc</p>
 	</footer>
+
+	<script>
+document.getElementById('sayHelloBtn').addEventListener('click', async () => {
+  const name = document.getElementById('visitorName').value.trim();
+
+  try {
+    const response = await fetch(`/api/helloVisitor?name=${encodeURIComponent(name)}`);
+    const data = await response.json();
+    document.getElementById('helloMessage').textContent = data.message;
+  } catch (err) {
+    console.error('Error:', err);
+    document.getElementById('helloMessage').textContent = 'Something went wrong!';
+  }
+});
+</script>
 </body>
 
 </html>
