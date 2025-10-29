@@ -41,6 +41,11 @@
 	        <p>Gamer</p>
 	        <p>Geek</p>
 	        <p>Debator</p>
+
+          <div class="chart-container">
+			<h2>Work Experience Overview</h2>
+			<canvas id="workChart" width="400" height="300"></canvas>
+		</div>
 		</div>
 
 		<div class="center-column">
@@ -54,6 +59,11 @@
 
 		
 		</main>
+
+		
+
+		
+  
 		
 
 		<div class="center-column">
@@ -71,7 +81,67 @@
 		<p>Ejlersen inc</p>
 	</footer>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script>
+  async function loadChartData() {
+    try {
+      const response = await fetch('/api');
+      const data = await response.json();
+
+      const labels = [
+        'Sales & Store',
+        'Middle Management',
+        'Management',
+        'Volunteer Event',
+        'Volunteer Board'
+      ];
+
+      const values = [
+        data.salesAndStore,
+        data.middleManagement,
+        data.management,
+        data.volunteerEvent,
+        data.volunteerBoard
+      ];
+
+      const ctx = document.getElementById('workChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Years of experience',
+            data: values,
+            backgroundColor: 'rgba(75, 200, 192, 0.6)', // 🟩 Bar color (fill)
+            borderColor: 'rgba(75, 192, 192, 1)',       // 🟩 Bar border color
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: { 
+              beginAtZero: true,
+              ticks: { color: '#fafafa' } // 🟢 Y-axis label color
+            },
+            x: { 
+              ticks: { color: '#fafafa' } // 🟢 X-axis label color
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#fafafa' } // 🟢 Legend text color
+            }
+          }
+        }
+      });
+    } catch (err) {
+      console.error('Error loading chart data:', err);
+    }
+  }
+
+  loadChartData();
+</script>
 
 <body>
 </body>
