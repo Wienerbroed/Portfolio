@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nodemon src/main.js",
+    "build": "node src/main.js",
     "dev": "rollup -c -w",
     "start": "nodemon src/main.js",
     "dev:server": "nodemon src/main.js"
