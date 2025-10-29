@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --no-clear",
+    "start": "nodemon src/main.js",
     "dev:server": "nodemon src/main.js"
   },
   "devDependencies": {
