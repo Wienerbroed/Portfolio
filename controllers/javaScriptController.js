@@ -16,3 +16,7 @@ const buyNewHorses = (req, res, next => {
     res.json(stable);
     res.send('New horses arrived');
 });
+
+
+
+export { sellHorse, buyNewHorses };

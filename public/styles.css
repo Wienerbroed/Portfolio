@@ -4,10 +4,17 @@
     padding: 0;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.5;
-    background-color: darkblue;
+    background-image: url('utils/star-4773.gif');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
     color: aliceblue;
     display: flex;
     flex-direction: column;
@@ -15,9 +22,9 @@ body {
 }
 
 header {
-    background-color: aqua;
+    background-color:aqua;
     color: black;
-    padding: 1rem;
+    padding: 0.7rem;
 }
 
 header h1 {
@@ -41,7 +48,7 @@ nav ul li {
 nav ul li a {
     color: white;
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 2rem;
     display: block;
     transition: background-color 0.3s;
 }
@@ -55,9 +62,47 @@ main {
     padding: 1rem;
 }
 
+main .container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    justify-content: center;
+    position: relative;    
+}
+
+.left-column {
+    position: absolute;
+    left: 0;
+    text-align: left;
+    max-width: 250;
+}
+
+.center-column {
+    text-align: center;
+    max-width: 600;
+}
+
 footer {
     background-color: white;
     color: black;
     text-align: center;
+    padding: 0.3rem;
+}
+
+pre {
+    background-color: #1e1e1e; /* dark background like editors */
+    color: #dcdcdc; /* light text color */
     padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto; /* horizontal scroll for long lines */
+    font-family: 'Fira Code', monospace; /* nice coding font */
+    font-size: 0.95rem;
+    border: 1px solid #333;
+    margin: 1rem auto;
+    width: 50%;
+}
+
+code {
+    font-family: inherit; /* inherits from pre */
+    color: #9cdcfe; /* blue-ish code text */
 }
