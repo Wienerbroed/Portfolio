@@ -3,46 +3,238 @@
 <head>
 	<meta charset='utf-8'>
 	<meta name='viewport' content='width=device-width,initial-scale=1'>
-
 	<title>My Page</title>
-
 	<link rel='stylesheet' href='styles.css'>
-	
-
-	
 </head>
-<body>
 
+<body>
 	<header> 
 		<nav>
-		<ul>
-			<li><a href="index.html"><img src="utils/home.png" alt="Home" width="40" height="40"></a></li>
-			<li><a href="java.html"><img src="utils/java.png" alt="Java" width="40" height="40"></a></li>
-			<li><a href="javaScript.html"><img src="utils/js.png" alt="javaScript" width="40" height="40"></a></li>
-			<li><a href="python.html"><img src="utils/python.png" alt="Python" width="40" height="40"></a></li>
-			<li><a href="ruby.html"><img src="utils/ruby.png" alt="Ruby" width="40" height="40"></a></li>
-			<li><a href="golang.html"><img src="utils/go.png" alt="GoLang" width="40" height="40"></a></li>
-			<li><a href="contact.html">Contact</a></li>
-		</ul>
-	</nav>
-
+			<ul>
+				<li><a href="index.html"><img src="utils/home.png" alt="Home" width="40" height="40"></a></li>
+				<li><a href="java.html"><img src="utils/java.png" alt="Java" width="40" height="40"></a></li>
+				<li><a href="javaScript.html"><img src="utils/js.png" alt="javaScript" width="40" height="40"></a></li>
+				<li><a href="python.html"><img src="utils/python.png" alt="Python" width="40" height="40"></a></li>
+				<li><a href="ruby.html"><img src="utils/ruby.png" alt="Ruby" width="40" height="40"></a></li>
+				<li><a href="golang.html"><img src="utils/go.png" alt="GoLang" width="40" height="40"></a></li>
+				<li><a href="contact.html">Contact</a></li>
+			</ul>
+		</nav>
 	</header>
 
-	
-
 	<main style="text-align: center;">
-		<h1> Martin Ejlersen </h1>
-		<img src="utils/profilbillede.jpg" alt="My Picture" width="300">
+
+		<div class="container">
+			<div class="left-column">
+				<h2>Frameworks and extensions</h2>
+				<p>Sinatra</p>
+				<img src="utils/rubymeme.png" alt="RubyMeme" width="400" height="200">
+			</div>
+		</div>
+
+		<h1 style="margin-bottom: 30px;">Simple presentation of quick skills</h1>
+		<h3>Loan payoff calculator</h3>
+
+		<div id="calculator">
+			<label>Loan Amount ($):</label><br>
+			<input type="number" id="loan" placeholder="e.g. 10000"><br><br>
+
+			<label>Monthly Interest Rate (%)</label><br>
+			<input type="number" id="interest" placeholder="e.g. 2"><br><br>
+
+			<label>Monthly Payment ($):</label><br>
+			<input type="number" id="monthlyPayoff" placeholder="e.g. 1000"><br><br>
+
+			<button id="calculateBtn">Calculate</button>
+		</div>
+
+		<div id="result" style="margin-top: 20px;"></div>
+
+		<canvas id="payoffChart" width="400" height="200" style="margin-top: 30px;"></canvas>
+
+		<p> Imports </p>
+		<pre class="left-align">
+			<code>
+require 'sinatra'
+require 'json'
+			</code>
+		</pre><br>
+
+		<p> Setup content type </p>
+		<pre class="left-align">
+			<code>
+before do
+  content_type :json
+end				
+			</code>
+		</pre><br>
+
+		<p> Make endpoint with method </p>
+		<pre class="left-align">
+			<code>
+//Api Setup
+
+post '/api/debtCalculator' do
+  request.body.rewind
+  data = JSON.parse(request.body.read) rescue {}
+
+// datatransfer methods
+
+  loan = data['loan']&.to_f
+  interest = data['interest']&.to_f
+  monthly_payoff = data['monthlypayoff']&.to_f
+
+// Error catch
+
+  if loan.nil? || interest.nil? || monthly_payoff.nil? || loan <= 0 || interest <= 0 || monthly_payoff <= 0
+    return { error: 'Please fill in all information.' }.to_json
+  end
+
+// Attributes
+
+  monthly_interest_rate = interest / 100.0
+  balance = loan
+  payment = monthly_payoff
+  months_to_payoff = 0
+  balances = [balance]
+
+// Loop prevention
+
+  if payment <= balance * monthly_interest_rate
+    return { error: 'Payment too low to ever pay off debt.' }.to_json
+  end
+
+  while balance > 0
+    interest_this_month = balance * monthly_interest_rate
+    balance = balance + interest_this_month - payment
+    balance = [balance, 0].max
+    balances << balance
+    months_to_payoff += 1
+
+    break if months_to_payoff > 1200
+  end
+
+// Attributes
+
+  total_paid = payment * months_to_payoff
+  interest_paid = total_paid - loan
+
+// Method bindings
+
+  {
+    monthsToPayoff: months_to_payoff,
+    totalPaid: total_paid,
+    interestPaid: interest_paid,
+    balances: balances
+  }.to_json
+end				
+			</code>
+		</pre>
 	</main>
-	<h1></h1>
-
-
 
 	<footer>
 		<p>Ejlersen inc</p>
 	</footer>
-</body>
 
-<body>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		const calculateBtn = document.getElementById('calculateBtn');
+		const resultDiv = document.getElementById('result');
+		let chartInstance;
+
+		calculateBtn.addEventListener('click', async () => {
+			const loan = parseFloat(document.getElementById('loan').value);
+			const interest = parseFloat(document.getElementById('interest').value);
+			const monthlyPayoff = parseFloat(document.getElementById('monthlyPayoff').value);
+
+			if (!loan || !interest || !monthlyPayoff) {
+				resultDiv.innerHTML = `<p style="color:red">Please fill in all fields.</p>`;
+				return;
+			}
+
+			const response = await fetch('/api/debtCalculator', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ loan, interest, monthlypayoff: monthlyPayoff }) // fixed casing
+			});
+
+			const data = await response.json();
+
+			if (data.error) {
+				resultDiv.innerHTML = `<p style="color:red">${data.error}</p>`;
+				if (chartInstance) chartInstance.destroy();
+				return;
+			}
+
+			resultDiv.innerHTML = `
+				<h3>Results:</h3>
+				<p>Months to Payoff: ${data.monthsToPayoff}</p>
+				<p>Total Paid: $${data.totalPaid.toFixed(2)}</p>
+				<p>Interest Paid: $${data.interestPaid.toFixed(2)}</p>
+			`;
+
+			const labels = data.balances.map((_, i) => i);
+			const ctx = document.getElementById('payoffChart').getContext('2d');
+
+			if (chartInstance) chartInstance.destroy();
+
+			chartInstance = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [{
+      label: 'Remaining Balance ($)',
+      data: data.balances,
+      borderWidth: 2,
+      borderColor: 'blue',
+      backgroundColor: 'rgba(0, 0, 255, 0.1)',
+      fill: true,
+      tension: 0.2
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        labels: {
+          color: 'white' // legend text color
+        }
+      },
+      title: {
+        color: 'white'
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: 'white' // X-axis label color
+        },
+        title: {
+          display: true,
+          text: 'Months',
+          color: 'white' // X-axis title color
+        },
+        grid: {
+          color: 'rgba(255,255,255,0.2)' // optional lighter grid lines
+        }
+      },
+      y: {
+        ticks: {
+          color: 'white' // Y-axis label color
+        },
+        title: {
+          display: true,
+          text: 'Balance ($)',
+          color: 'white' // Y-axis title color
+        },
+        grid: {
+          color: 'rgba(255,255,255,0.2)' // optional lighter grid lines
+        }
+      }
+    }
+  }
+});
+		});
+	</script>
 </body>
 </html>

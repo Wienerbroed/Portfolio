@@ -5,6 +5,7 @@ import { helloVisitor } from '../controllers/javaController.js';
 import { contactForm } from '../controllers/contactController.js';
 import { getShoppingList, addItemToShoppingList, removeItemFromShoppingList, updateItemOnShoppingList } from '../controllers/goLangController.js';
 import { matchingInputs } from '../controllers/pythonController.js';
+import { calculateLoanPayoff } from '../controllers/rubyController.js';
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.post('/shoppingAdd', addItemToShoppingList);
 router.delete('/shoppingDelete', removeItemFromShoppingList);
 router.post('/shoppingUpdate', updateItemOnShoppingList);
 router.post('/matching-words', matchingInputs);
+router.post('/debtCalculator', calculateLoanPayoff);
 
 
 export default router;
