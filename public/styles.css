@@ -32,7 +32,10 @@ header h1 {
 }
 
 nav {
-    background-color: rgb(32, 94, 42);
+    background-image: url('utils/navbar.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 nav ul  {

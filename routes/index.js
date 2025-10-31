@@ -4,6 +4,7 @@ import { buyNewHorses, sellHorse } from '../controllers/javaScriptController.js'
 import { helloVisitor } from '../controllers/javaController.js';
 import { contactForm } from '../controllers/contactController.js';
 import { getShoppingList, addItemToShoppingList, removeItemFromShoppingList, updateItemOnShoppingList } from '../controllers/goLangController.js';
+import { matchingInputs } from '../controllers/pythonController.js';
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.get('/shoppingList', getShoppingList);
 router.post('/shoppingAdd', addItemToShoppingList);
 router.delete('/shoppingDelete', removeItemFromShoppingList);
 router.post('/shoppingUpdate', updateItemOnShoppingList);
+router.post('/matching-words', matchingInputs);
 
 
 export default router;

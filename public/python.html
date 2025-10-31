@@ -28,21 +28,116 @@
 
 	</header>
 
+	<main style="text-align: center;">
+		<div class="container">
+			<div class="left-column">
+				<h2>Frameworks and extensions</h2>
+				<p>Flask</p>
+				<img src="utils/pythonmeme.png" alt="PythonMeme" width="250" height="400">
+			</div>
+		</div>
+	</main>
+
 	
 
 	<main style="text-align: center;">
-		<h1> Martin Ejlersen </h1>
-		<img src="utils/profilbillede.jpg" alt="My Picture" width="300">
-	</main>
-	<h1></h1>
+		<h1 style="margin-bottom: 20px;">Simple presentation of quick skills</h1>
 
+		<h3 style="margin-bottom: 10px;"> Creating a simple anagram checker</h3>
+		<h2>Check if words are anagrams</h2>
+  <form id="anagramForm">
+    <input type="text" id="word" name="word" placeholder="First word" required>
+    <input type="text" id="word1" name="word1" placeholder="Second word" required>
+    <button type="submit">Check</button>
+  </form>
+  <p id="result"></p>
+
+  <p> Imports </p>
+  <pre class="left-align ">
+	<code>
+from flask import Flask, request, jsonify
+	</code> 
+</pre>
+
+<p> Setup app </p>
+<pre class="left-align">
+	<code>
+app = Flask(__name__)		
+	</code>
+</pre>
+
+<p> Create route </p>
+<pre class="left-align">
+	<code>
+@app.route('/api/matching-words', methods=['POST'])		
+	</code>
+</pre>
+
+<p> Make function for anagram checker </p>
+<pre class="left-align">
+	<code>
+def matching_inputs():
+    data = request.get_json()
+
+    word = data.get('word')
+    word1 = data.get('word1')
+
+    if not word or not word1:
+        return jsonify({'error': 'Please insert word in both fields'}), 400
+
+    sorted_word = ''.join(sorted(word.lower()))
+    sorted_word1 = ''.join(sorted(word1.lower()))
+
+    if sorted_word == sorted_word1:
+        message = f"{word} is an anagram of {word1}"
+    else:
+        message = f"{word} is NOT an anagram of {word1}"
+
+    return jsonify({'message': message})
+
+if __name__ == '__main__':		
+	</code>
+</pre>
+
+<p> Run app </p>
+<pre class="left-align">
+	<code>
+app.run(debug=True, port=8080)		
+	</code>
+</pre>
+
+	</main>
 
 
 	<footer>
 		<p>Ejlersen inc</p>
 	</footer>
-</body>
 
-<body>
+	<script>
+    document.getElementById('anagramForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const word = document.getElementById('word').value.trim();
+        const word1 = document.getElementById('word1').value.trim();
+
+        const response = await fetch('/api/matching-words', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ word, word1 })
+        });
+
+        const data = await response.json();
+        const result = document.getElementById('result');
+
+        if (data.error) {
+            result.textContent = data.error;
+            result.style.color = 'red';
+        } else {
+            result.textContent = data.message;
+            result.style.color = 'green';
+    }
+});
+</script>
+
 </body>
 </html>
