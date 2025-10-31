@@ -95,37 +95,10 @@ app.listen(port, () => console.log(`✅ Server running on port ${port}`));
 export default app;
 		</code></pre>
 
-		<p>Script to add at bottom of html file</p>
-		<pre class="left-align"><code>
-script>
-    const stableDisplay = document.getElementById('stableDisplay');
-    const buyBtn = document.getElementById('buyBtn');
-    const sellBtn = document.getElementById('sellBtn');
+		<p> Integrate to html and enjoy list </p>
+		
 
-    const updateStableDisplay = (stable) => {
-      if(stable.length === 0) {
-        stableDisplay.textContent = 'Stable is empty';
-      } else {
-        // Show a horse emoji for each horse in the stable
-        stableDisplay.textContent = '🐴'.repeat(stable.length);
-      }
-    }
-
-    buyBtn.addEventListener('click', async () => {
-  const res = await fetch('/api/buy-horses');
-  const data = await res.json();
-  updateStableDisplay(data);
-});
-
-sellBtn.addEventListener('click', async () => {
-  const res = await fetch('/api/sell-horse');
-  const data = await res.json();
-  updateStableDisplay(data);
-});
-/script>
-		</code></pre>
-
-		<p style="margin-bottom: 20px;">Create buttons for function result presented under here</p>
+	
 
 		<div class="buttons">
       <button id="buyBtn" style="padding: 20px 40px; font-size: 1.5rem;">Buy New Horses 🐴</button>

@@ -28,11 +28,205 @@
 
 	</header>
 
+	<main style="text-align: center;">
+		<div class="container">
+			<div class="left-column">
+				<h2>Frameworks and extensions</h2>
+				<p>Gorilla</p>
+				<img src="utils/goLangmeme.png" alt="goLangMeme" width="300" height="250">
+			</div>
+		</div>
+	</main>
+
 	
 
 	<main style="text-align: center;">
-		<h1> Martin Ejlersen </h1>
-		<img src="utils/profilbillede.jpg" alt="My Picture" width="300">
+		<h1 style="margin-bottom: 30px;">Simple presentation of quick skills</h1>
+		<h3>Making a simple shopping list</h3>
+
+		<section id="shopping-section">
+          <h2>🛒 Shopping List</h2>
+          <ul id="shopping-list"></ul>
+
+          <input type="text" id="new-item" placeholder="Add a new item" style="padding: 10px 20px;"/>
+          <button id="add-btn" style="padding: 10px 20px;">Add</button>
+        </section>
+
+		<p> Imports </p>
+		<pre class="left-align">
+			<code>
+import (
+	"encoding/json"
+	"net/http"
+	"sync"
+
+	"github.com/gorilla/mux"
+)
+		</code>
+	</pre>
+
+	<p> Make list </p>
+	<pre class="left-align">
+		<code>
+var (
+	shoppingList []string
+	mutex        sync.Mutex
+)			
+		</code>
+	</pre>
+
+	<p> Make function to send JSON response </p>
+	<pre class="left-align">
+		<code>
+func sendJSON(w http.ResponseWriter, data interface{}, status int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
+}
+		</code>
+	</pre>
+
+	<p> GET Method to get shopping list </p>
+	<pre class="left-align">
+		<code>
+func getShoppingList(w http.ResponseWriter, r *http.Request) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	sendJSON(w, shoppingList, http.StatusOK)
+}			
+		</code>
+	</pre>
+
+	<p> POST method to add item </p>
+	<pre class="left-align">
+		<code>
+func addItemToShoppingList(w http.ResponseWriter, r *http.Request) {
+	var body struct {
+		Name string `json:"name"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sendJSON(w, map[string]string{"error": "Invalid JSON"}, http.StatusBadRequest)
+		return
+	}
+
+	item := body.Name
+	if item == "" {
+		item = "Blank"
+	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if len(shoppingList) >= 10 {
+		sendJSON(w, map[string]interface{}{
+			"error":        "Shopping list full.",
+			"shoppingList": shoppingList,
+		}, http.StatusBadRequest)
+		return
+	}
+
+	shoppingList = append(shoppingList, item)
+	sendJSON(w, shoppingList, http.StatusOK)
+}
+
+		</code>
+	</pre>
+
+	<p> DELETE method for shopping list </p>
+	<pre class="left-align">
+		<code>
+func removeItemFromShoppingList(w http.ResponseWriter, r *http.Request) {
+	var body struct {
+		Name string `json:"name"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sendJSON(w, map[string]string{"error": "Invalid JSON"}, http.StatusBadRequest)
+		return
+	}
+
+	name := body.Name
+	if name == "" {
+		sendJSON(w, map[string]interface{}{
+			"error":        "No item provided.",
+			"shoppingList": shoppingList,
+		}, http.StatusBadRequest)
+		return
+	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	// Remove only the first matching element
+	for i, v := range shoppingList {
+		if v == name {
+			shoppingList = append(shoppingList[:i], shoppingList[i+1:]...)
+			break
+		}
+	}
+
+	sendJSON(w, shoppingList, http.StatusOK)
+}			
+		</code>
+	</pre>
+
+	<p> POST method for updating items </p>
+	<pre class="left-align">
+		<code>
+func updateItemOnShoppingList(w http.ResponseWriter, r *http.Request) {
+	var body struct {
+		OldName string `json:"oldName"`
+		NewName string `json:"newName"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sendJSON(w, map[string]string{"error": "Invalid JSON"}, http.StatusBadRequest)
+		return
+	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	found := false
+	for i, v := range shoppingList {
+		if v == body.OldName {
+			if body.NewName == "" {
+				body.NewName = "Blank"
+			}
+			shoppingList[i] = body.NewName
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		sendJSON(w, map[string]string{"error": "Item not found."}, http.StatusBadRequest)
+		return
+	}
+
+	sendJSON(w, shoppingList, http.StatusOK)
+}
+		</code>
+	</pre>
+
+	<p> Main fuction with routers to endpoints </p>
+	<pre class="left-align">
+		<code>
+func main() {
+	r := mux.NewRouter()
+
+	r.HandleFunc("/shoppingList", getShoppingList).Methods("GET")
+	r.HandleFunc("/shoppingAdd", addItemToShoppingList).Methods("POST")
+	r.HandleFunc("/shoppingDelete", removeItemFromShoppingList).Methods("DELETE")
+	r.HandleFunc("/shoppingUpdate", updateItemOnShoppingList).Methods("POST")
+
+	http.ListenAndServe(":8080", r)
+}
+		</code>
+	</pre>
+
+	<p> Integrate into html and enjoy your shopping list </p>
+
+
 	</main>
 	<h1></h1>
 
@@ -41,8 +235,99 @@
 	<footer>
 		<p>Ejlersen inc</p>
 	</footer>
+
+<script>
+const API_BASE = '/api';
+
+const listEl = document.getElementById('shopping-list');
+const newItemInput = document.getElementById('new-item');
+const addBtn = document.getElementById('add-btn');
+
+function renderList(items) {
+  listEl.innerHTML = '';
+  items.forEach(item => {
+    if (!item) return;
+    const li = document.createElement('li');
+    li.textContent = item + ' ';
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '🗑️';
+    delBtn.onclick = () => deleteItem(item);
+
+    const updBtn = document.createElement('button');
+    updBtn.textContent = '✏️';
+    updBtn.onclick = () => {
+      const newName = prompt('Enter new item name:', item);
+      if (newName) updateItem(item, newName);
+    };
+
+    li.appendChild(updBtn);
+    li.appendChild(delBtn);
+    listEl.appendChild(li);
+  });
+}
+
+async function fetchList() {
+  const res = await fetch(`${API_BASE}/shoppingList`);
+  const data = await res.json();
+  renderList(data);
+}
+
+addBtn.onclick = async () => {
+  const name = newItemInput.value.trim();
+  if (!name) return alert('Please enter an item');
+
+  const res = await fetch(`${API_BASE}/shoppingAdd`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name })
+  });
+
+  const data = await res.json();
+
+  // Handle 400 error gracefully
+  if (!res.ok) {
+    alert(data.error);
+    renderList(data.shoppingList || []);
+    return;
+  }
+
+  renderList(data);
+  newItemInput.value = '';
+};
+
+async function deleteItem(name) {
+  const res = await fetch(`${API_BASE}/shoppingDelete`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name })
+  });
+  const data = await res.json();
+
+  // Even if there’s an error, render current list
+  renderList(data.shoppingList || data);
+}
+
+async function updateItem(oldName, newName) {
+  const res = await fetch(`${API_BASE}/shoppingUpdate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ oldName, newName })
+  });
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error);
+    renderList(data.shoppingList || []);
+    return;
+  }
+
+  renderList(data);
+}
+
+fetchList();
+</script>
 </body>
 
-<body>
-</body>
+
 </html>
